@@ -182,34 +182,70 @@ export function getTodosTemplate(group) {
  */
 export function renderEditTodoForm(todo) {
   return /*html*/`
-    <div class="overlay">
-      <h1 class="overlay__header">Edit todo</h1>
-      <form class="edit-form todo-edit-form" data-group-id=${todo.groupId} data-todo-id=${todo.id}>
-        <label class="edit-form__form-label form-label">
-          <span class="edit-form__form-label-text">Edit todo title</span>
-          <input class="input" type="text" placeholder="Edit todo title" name="title" value="${todo.title}" ${validation('title')}>
-        </label>
-        <label class="edit-form__form-label form-label">
-          <span class="edit-form__form-label-text">Edit description</span>
-          <input class="input" type="text" placeholder="Edit description" name="description" value="${todo.description}" ${validation('description')}>
-        </label>
-        <label class="edit-form__form-label form-label">
-          <span class="edit-form__form-label-text">Edit status</span>
-          <select class="input" name="done">
-            <option value="true" ${todo.done ? 'selected' : ''}>Done</option>
-            <option value="false" ${!todo.done ? 'selected' : ''}>In progress</option>
-          </select>
-        </label>
-        <button class="button button_primary" onclick="history.back()">
-          ${backIcon()}
-          Back
-        </button>
-        <button class="button button_primary edit-form__edit-button" type="submit">
-          ${editIcon()}
-          Edit
-        </button>
-      </form>
+    <h1 class="title container__title">Edit todo</h1>
+    <form class="edit-form todo-edit-form" data-group-id=${todo.groupId} data-todo-id=${todo.id}>
+      <label class="edit-form__form-label form-label">
+        <span class="edit-form__form-label-text">Edit todo title</span>
+        <input class="input" type="text" placeholder="Edit todo title" name="title" value="${todo.title}" ${validation('title')}>
+      </label>
+      <label class="edit-form__form-label form-label">
+        <span class="edit-form__form-label-text">Edit description</span>
+        <input class="input" type="text" placeholder="Edit description" name="description" value="${todo.description}" ${validation('description')}>
+      </label>
+      <label class="edit-form__form-label form-label">
+        <span class="edit-form__form-label-text">Edit status</span>
+        <select class="input" name="done">
+          <option value="true" ${todo.done ? 'selected' : ''}>Done</option>
+          <option value="false" ${!todo.done ? 'selected' : ''}>In progress</option>
+        </select>
+      </label>
+      <button class="button button_primary" onclick="history.back()">
+        ${backIcon()}
+        Back
+      </button>
+      <button class="button button_primary edit-form__edit-button" type="submit">
+        ${editIcon()}
+        Edit
+      </button>
+    </form>
+  `;
+}
+
+/**
+ * 
+ * @param {string} content 
+ */
+export function renderModal(content) {
+  return /*html*/`
+    <div className="modal">
+      <div className="modal__content">
+        ${content}
+      </div>
     </div>
+  `
+}
+
+/**
+ * @param {User[]} users 
+ * @returns 
+ */
+export function renderGetTodosForm(users) {
+  return /*html*/`
+    <h1 class="title container__title">Edit todo</h1>
+    <form class="edit-form todo-edit-form" data-group-id=${todo.groupId} data-todo-id=${todo.id}>
+      <label class="edit-form__form-label form-label">
+        <span class="edit-form__form-label-text">Select user for import</span>
+        <select class="input" name="done">
+          ${users.map(user => {
+            return `<option value="${user.id}" ${user.id === 1 ? 'selected' : ''}>${user.name}</option>`
+          })}
+        </select>
+      </label>
+      <button class="button button_primary edit-form__edit-button" type="submit">
+        ${editIcon()}
+        Import
+      </button>
+    </form>
   `;
 }
 

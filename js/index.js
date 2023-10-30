@@ -1,6 +1,7 @@
 // @ts-check
+/// <reference path="./types.d.ts" />
 
-import { getTodo, getTodoGroupById } from './data.js';
+import { getGroup, getTodo, getTodoGroupById } from './data.js';
 import { handleClick, handleSubmit, initCustomEvents } from './handlers.js';
 import { Maybe } from './helpers.js';
 import { renderGroups, renderTodos, renderNotFound, renderEditTodoForm } from './renders.js';

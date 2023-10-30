@@ -127,8 +127,12 @@ body {
   text-transform: uppercase;
 }
 
-.header__title {
+.header__title, .container__title {
   margin: 0;
+}
+
+.container__title {
+  margin-bottom: 1rem;
 }
 
 .header {
@@ -333,13 +337,19 @@ body {
   opacity: 0;
 }
 
+.modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Form started */
 
-.overlay {
-}
 .edit-form {
   background-color: var(--bg-color);
-  border-radius: 0.25rem;
   /* padding: 1rem; */
   transition: box-shadow 0.3s ease 0s;
   width: 100%;

@@ -144,10 +144,10 @@ function handleEditTodo(form) {
  * @returns 
  */
 function handleToggleTodo({ groupId, todoId }) {
-  const { todos, todo } = getData({ groupId, todoId });
+  const todo = getTodo({ groupId, todoId });
   if (!todo) return;
   todo.done = !todo.done;
-  saveTodos(todos);
+  saveTodos();
   Maybe.of(document.querySelector(`.todo[data-id="${todoId}"]`))
     .bind(todoElement => todoElement.querySelector(".todo__title"))
     .do(subtitle => subtitle.classList.toggle("todo-title_done"))

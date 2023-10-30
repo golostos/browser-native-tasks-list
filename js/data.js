@@ -3,15 +3,15 @@
 import { Maybe } from './helpers.js';
 
 export function getTodoGroupById(id) {
-  const todos = getTodos();
+  const todos = getTodoGroups();
   return todos.find(group => group.id === Number(id));
 }
 
 /**
  * 
- * @returns {Todos}
+ * @returns {Group[]}
  */
-export function getTodos() {
+export function getTodoGroups() {
   const baseTodos = [
     {
       id: 1,
@@ -56,7 +56,7 @@ export function getTodos() {
  * @returns 
  */
 export function getGroup({id, todos = null}) {  
-  return Maybe.of(todos ?? getTodos())
+  return Maybe.of(todos ?? getTodoGroups())
     .bind(todos => todos.find(group => group.id === Number(id)))
     .get();
 }
@@ -66,10 +66,19 @@ export function getGroup({id, todos = null}) {
  * @param {GetTodoParams} params
  * @returns 
  */
-export function getTodo({ groupId, todoId, group = null }) {
-  return Maybe.of(group ?? getGroup({ id: groupId }))
+export function getTodo({ groupId = null, todoId, group = null }) {
+  if (groupId) return Maybe.of(group ?? getGroup({ id: groupId }))
     .bind(group => group.todos.find(todo => todo.id === Number(todoId)))
     .get();
+  return Maybe.of(getTodoGroups())
+    .bind(groups => {
+      for (const group of groups) {
+        for (const todo of group.todos) {
+          if (todo.id === todoId) return todo
+        }
+      }
+    })
+    .get()
 }
 
 /**
@@ -78,7 +87,7 @@ export function getTodo({ groupId, todoId, group = null }) {
  * @returns 
  */
 export function getData({ groupId, todoId = null }) {
-  const todos = getTodos();
+  const todos = getTodoGroups();
   const group = getGroup({ id: groupId, todos });
   if (todoId === null) return { todos, group };
   const todo = getTodo({
@@ -94,7 +103,7 @@ export function getData({ groupId, todoId = null }) {
  * @param {Todos?} todos 
  */
 export function saveTodos(todos = null) {
-  localStorage.setItem("todos", JSON.stringify(todos ?? getTodos()));
+  localStorage.setItem("todos", JSON.stringify(todos ?? getTodoGroups()));
 }
 
 /**

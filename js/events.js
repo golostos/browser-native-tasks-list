@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference path="./types.d.ts" />
 
 import { partial, toJson } from './helpers.js';
 
@@ -9,6 +10,8 @@ export function initDispatchEvent() {
   }
   window.dispatch = dispatchEvent;
 }
+
+
 
 export function on(eventName, callback) {
   document.addEventListener(eventName, (event) => {

@@ -41,7 +41,7 @@ type GetGroupParams = {
 }
 
 type GetTodoParams = {
-  groupId: number;
+  groupId?: number | null;
   todoId: number;
   group?: Group | null;
 };

@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference path="./types.d.ts" />
 
 /**
  * @template T
@@ -85,4 +86,27 @@ export function toJson(value) {
   } catch (e) {
     return null;
   }
+}
+
+/**
+ * 
+ * @param {string} value 
+ * @returns 
+ */
+export function sanitize(value) {
+  const temp = document.createElement('div');
+  temp.textContent = value;
+  return temp.innerHTML;
+}
+
+/**
+ * 
+ * @param {TemplateStringsArray} strings 
+ * @param  {...any} values 
+ */
+export function fragment(strings, ...values) {
+  const dirty = strings.reduce((acc, str, i) => acc + str + (values[i] ?? ''), '');
+  const template = document.createElement('template');
+  template.innerHTML = dirty;
+  return template.content;
 }

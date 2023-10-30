@@ -1,18 +1,21 @@
 // @ts-check
+/// <reference path="./types.d.ts" />
 
-import { getTodos } from './data.js';
+import { getTodoGroups } from './data.js';
 import { onGetFakeTodos, onRemoveAllTodos, onRemoveTodo, onShowEditTodoForm, onToggleTodo } from './events.js';
+import { handleAddTodo, handleAddTodoGroup, handleEditTodo } from './form-handlers.js';
+import { fragment } from './helpers.js';
 import { addIcon, backIcon, doneIcon, downloadIcon, editIcon, showIcon, progressIcon, removeIcon, hideIcon, homeIcon } from "./icons.js";
 
 export function renderNotFound() {
-  return /*html*/`
+  return fragment/*html*/`
     <h1 class="title container__title">PAGE NOT FOUND</h1>
   `;
 }
 
 export function renderGroups() {
-  const groups = getTodos();
-  return /*html*/`
+  const groups = getTodoGroups();
+  const page = fragment/*html*/`
     <div class="groups">
       <div class="header">
         <h1 class="title header__title">Todos list</h1>
@@ -46,6 +49,8 @@ export function renderGroups() {
       </div>
     </div>
   `;
+  page.querySelector('.create-form')?.addEventListener("submit", handleAddTodoGroup);
+  return page;
 }
 
 export function getTodoGroupsTemplate(groups) {
@@ -76,7 +81,7 @@ export function getTodoGroupsTemplate(groups) {
 }
 
 export function renderTodos(group) {
-  return /*html*/`
+  const page = fragment/*html*/`
     <div class="todos" data-group-id="${group.id}">
       <div class="header">
         <h1 class="title header__title">${group.title}</h1>
@@ -135,6 +140,8 @@ export function renderTodos(group) {
       </div>
     </div>
     `
+  page.querySelector('.create-form')?.addEventListener("submit", handleAddTodo);
+  return page;
 }
 
 /**
@@ -181,7 +188,7 @@ export function getTodosTemplate(group) {
  * @returns 
  */
 export function renderEditTodoForm(todo) {
-  return /*html*/`
+  const page = fragment/*html*/`
     <h1 class="title container__title">Edit todo</h1>
     <form class="edit-form todo-edit-form" data-group-id=${todo.groupId} data-todo-id=${todo.id}>
       <label class="edit-form__form-label form-label">
@@ -198,6 +205,36 @@ export function renderEditTodoForm(todo) {
           <option value="true" ${todo.done ? 'selected' : ''}>Done</option>
           <option value="false" ${!todo.done ? 'selected' : ''}>In progress</option>
         </select>
+      </label>
+      <button class="button button_primary" onclick="history.back()">
+        ${backIcon()}
+        Back
+      </button>
+      <button class="button button_primary edit-form__edit-button" type="submit">
+        ${editIcon()}
+        Edit
+      </button>
+    </form>
+  `;
+  page.querySelector('.edit-form')?.addEventListener("submit", handleEditTodo);
+  return page;
+}
+/**
+ * 
+ * @param {Group} group 
+ * @returns 
+ */
+export function renderEditGroupForm(group) {
+  return fragment/*html*/`
+    <h1 class="title container__title">Edit todo</h1>
+    <form class="edit-form todo-edit-form" data-group-id=${group.id}>
+      <label class="edit-form__form-label form-label">
+        <span class="edit-form__form-label-text">Edit todo title</span>
+        <input class="input" type="text" placeholder="Edit todo title" name="title" value="${group.title}" ${validation('title')}>
+      </label>
+      <label class="edit-form__form-label form-label">
+        <span class="edit-form__form-label-text">Edit description</span>
+        <input class="input" type="text" placeholder="Edit description" name="description" value="${group.description}" ${validation('description')}>
       </label>
       <button class="button button_primary" onclick="history.back()">
         ${backIcon()}
@@ -232,7 +269,7 @@ export function renderModal(content) {
 export function renderGetTodosForm(users) {
   return /*html*/`
     <h1 class="title container__title">Edit todo</h1>
-    <form class="edit-form todo-edit-form" data-group-id=${todo.groupId} data-todo-id=${todo.id}>
+    <form class="edit-form todo-edit-form">
       <label class="edit-form__form-label form-label">
         <span class="edit-form__form-label-text">Select user for import</span>
         <select class="input" name="done">

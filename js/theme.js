@@ -1,3 +1,6 @@
+// @ts-check
+/// <reference path="./types.d.ts" />
+
 import {moonIcon, sunIcon} from "./icons.js";
 
 function getTheme() {

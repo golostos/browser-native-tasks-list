@@ -2,9 +2,9 @@
 /// <reference path="./types.d.ts" />
 
 import { getGroup, getTodo, getTodoGroupById } from './data.js';
-import { handleClick, handleSubmit, initCustomEvents } from './handlers.js';
+import { handleClick, initCustomEvents } from './event-handlers.js';
 import { Maybe } from './helpers.js';
-import { renderGroups, renderTodos, renderNotFound, renderEditTodoForm } from './renders.js';
+import { renderGroups, renderTodos, renderNotFound, renderEditTodoForm, renderEditGroupForm } from './renders.js';
 import {initTheme} from "./theme.js";
 
 const stylesLink = document.createElement("link");
@@ -17,13 +17,13 @@ document.addEventListener("DOMContentLoaded", start);
 function start() {
   const root = document.getElementById("root");
   if (!root) return;
-  root.innerHTML = `
+  root.innerHTML = /*html*/`
     <div class="container">
-      <div class="content">
-        ${router()}
-      </div>
-    </div>`
-  root.addEventListener("submit", handleSubmit);
+      <div class="content"></div>
+    </div>` 
+  const container = document.querySelector(".content");
+  if (!container) return;
+  container.replaceChildren(router());
   root.addEventListener("click", handleClick);
   initTheme()
   initCustomEvents()
@@ -32,7 +32,8 @@ function start() {
 window.addEventListener("hashchange", () => {
   const container = document.querySelector(".content");
   if (!container) return;
-  container.innerHTML = router();
+  // container.innerHTML = router();
+  container.replaceChildren(router());
 });
 
 function router() {
@@ -40,6 +41,14 @@ function router() {
   switch (true) {
     case hash === "":
       return renderGroups();
+    case /^#\/edit\/\d+/.test(hash):
+      return Maybe.of(hash.match(/^#\/todos\/(\d+)\/edit\/(\d+)/))
+        .bind(([, groupId]) => getGroup({
+          id: Number(groupId)
+        }))
+        .bind(group => renderEditGroupForm(group))
+        .catch(() => renderNotFound())
+        .get();
     case /^#\/todos\/\d+\/edit\/\d+/.test(hash):
       return Maybe.of(hash.match(/^#\/todos\/(\d+)\/edit\/(\d+)/))
         .bind(([, groupId, todoId]) => getTodo({

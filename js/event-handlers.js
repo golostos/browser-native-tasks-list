@@ -1,73 +1,11 @@
 // @ts-check
+/// <reference path="./types.d.ts" />
 
-import { getData, getFakeTodosForUser, getGroup, getTodo, getTodos, saveTodos } from './data.js';
+import { getFakeTodosForUser, getGroup, getTodo, saveTodos } from './data.js';
 import { events, initDispatchEvent, on } from './events.js';
 import { Maybe, compose, getFullHeightOfChildren } from './helpers.js';
 import { doneIcon, hideIcon, progressIcon, showIcon } from './icons.js';
-import { getTodoGroupsTemplate, getTodosTemplate } from './renders.js';
-
-export function handleSubmit(event) {
-  event.preventDefault();
-  const form = event.target;
-  if (form.classList.contains("groups__create-form")) {
-    handleAddTodoGroup(form);
-  }
-  if (form.classList.contains("todos__create-form")) {
-    handleAddTodo(form);
-  }
-  if (form.classList.contains("todo-edit-form")) {
-    handleEditTodo(form);
-  }
-}
-
-export function handleAddTodoGroup(form) {
-  const { title, description } = handleForm(form);
-  if (title && description) {
-    const todos = getTodos();
-    const newGroup = {
-      id: todos.length + 1,
-      title,
-      description,
-      todos: [],
-    };
-    todos.push(newGroup);
-    saveTodos(todos);
-    const groupsList = document.querySelector(".groups__list");
-    if (!groupsList) return;
-    groupsList.insertAdjacentHTML("beforeend", getTodoGroupsTemplate([newGroup]));
-  }
-}
-
-export function handleForm(form) {
-  const values = {};
-  const inputs = form.querySelectorAll('input[name],select[name]');
-  inputs.forEach(input => {
-    values[input.name] = input.value;
-    input.value = "";
-  });
-  return values;
-}
-
-export function handleAddTodo(form) {
-  const { title, description } = handleForm(form);
-  if (title && description) {
-    const groupId = form.closest(".todos").dataset.groupId;
-    const { todos, group } = getData({ groupId });
-    if (!group) return;
-    const newTodo = {
-      id: group.todos.length + 1,
-      title,
-      description,
-      done: false,
-      groupId
-    };
-    group.todos.push(newTodo);
-    saveTodos(todos);
-    const todoList = document.querySelector(".todos__list");
-    if (!todoList) return;
-    todoList.insertAdjacentHTML("beforeend", getTodosTemplate({ ...group, todos: [newTodo] }));
-  }
-}
+import { getTodosTemplate } from './renders.js';
 
 export function handleDropdown(event) {
   const dropdown = event.target.closest(".dropdown");
@@ -119,23 +57,6 @@ function handleEditGroup({ id, title, description }) {
 function handleShowEditTodoForm({ groupId, todoId }) {
   // history.pushState(null, '', `#/todos/edit?groupId=${groupId}&todoId=${todoId}`);
   window.location.hash = `#/todos/${groupId}/edit/${todoId}`;
-}
-
-/**
- * 
- * @param {HTMLFormElement} form 
- */
-function handleEditTodo(form) {
-  const { title, description, done } = handleForm(form)
-  const groupId = Number(form.dataset.groupId)
-  const todoId = Number(form.dataset.todoId)
-  const todo = getTodo({ groupId, todoId });
-  if (!todo) return;
-  todo.title = title;
-  todo.description = description;
-  todo.done = done === 'true'
-  saveTodos();
-  window.location.hash = `#/todos/${groupId}`
 }
 
 /**

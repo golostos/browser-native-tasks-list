@@ -14,7 +14,15 @@ type EditTodoParams = BaseTodoParams & {
 
 type ShowEditTodoFormParams = BaseTodoParams;
 
+type ShowEditGroupFormParams = {
+  groupId: number;
+};
+
 type RemoveAllTodosParams = {
+  groupId: number;
+};
+
+type RemoveGroupParams = {
   groupId: number;
 };
 

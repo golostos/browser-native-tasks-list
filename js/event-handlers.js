@@ -1,7 +1,7 @@
 // @ts-check
 /// <reference path="./types.d.ts" />
 
-import { getFakeTodosForUser, getGroup, getTodo, saveTodos } from './data.js';
+import { getFakeTodosForUser, getGroup, getTodo, getTodoGroups, saveTodos } from './data.js';
 import { events, initDispatchEvent, on } from './events.js';
 import { Maybe, compose, getFullHeightOfChildren } from './helpers.js';
 import { doneIcon, hideIcon, progressIcon, showIcon } from './icons.js';
@@ -37,17 +37,13 @@ export const handleClick = compose(
 
 // These handler functions below run by custom events
 
-function handleEditGroup({ id, title, description }) {
-  const group = getGroup(id);
-  if (!group) return;
-  group.title = title;
-  group.description = description;
-  saveTodos();
-  Maybe.of(document.querySelector(`.group[data-id="${id}"]`))
-    .bind(groupElement => groupElement.querySelector(".group__title"))
-    .do(groupTitle => groupTitle.textContent = title)
-    .bind(() => document.querySelector(`.group[data-id="${id}"] .description`))
-    .do(groupDescription => groupDescription.textContent = description)
+/**
+ * 
+ * @param {ShowEditGroupFormParams} params
+ */
+function handleShowEditGroupForm({ groupId }) {
+  // history.pushState(null, '', `#/todos/edit?groupId=${groupId}&todoId=${todoId}`);
+  window.location.hash = `#/todos/${groupId}/edit`;
 }
 
 /**
@@ -56,7 +52,7 @@ function handleEditGroup({ id, title, description }) {
  */
 function handleShowEditTodoForm({ groupId, todoId }) {
   // history.pushState(null, '', `#/todos/edit?groupId=${groupId}&todoId=${todoId}`);
-  window.location.hash = `#/todos/${groupId}/edit/${todoId}`;
+  window.location.hash = `#/todos/${groupId}/${todoId}/edit`;
 }
 
 /**
@@ -89,12 +85,25 @@ function handleRemoveTodo({ groupId, todoId }) {
     .do(todoElement => todoElement.remove());
 }
 
-function handleRemoveGroup() {
-
+/**
+ * 
+ * @param {RemoveGroupParams} details 
+ */
+function handleRemoveGroup({ groupId }) {
+  if (!confirm("Are you sure?")) return;
+  Maybe.of(getTodoGroups())
+    .bind(groups => groups.filter(group => group.id !== Number(groupId)))
+    .do(groups => saveTodos(groups))
+    .bind(() => document.querySelector(`.group[data-id="${groupId}"]`))
+    .do(groupElement => groupElement.remove())
+    .catch(() => window.location.hash = "");
 }
 
 function handleRemoveAllGroups() {
-
+  if (!confirm("Are you sure?")) return;
+  saveTodos([]);
+  Maybe.of(document.querySelector(".groups__list"))
+    .do(groupList => groupList.innerHTML = "");
 }
 
 /**
@@ -130,12 +139,13 @@ async function handleGetFakeTodos({ groupId, userId }) {
 
 export function initCustomEvents() {
   initDispatchEvent();
-  on(events.editGroup, handleEditGroup);
+  // on(events.editGroup, handleEditGroup);
   on(events.toggleTodo, handleToggleTodo);
   on(events.removeTodo, handleRemoveTodo);
   on(events.removeGroup, handleRemoveGroup);
   on(events.removeAllGroups, handleRemoveAllGroups);
   on(events.removeAllTodos, handleRemoveAllTodos);
   on(events.getFakeTodos, handleGetFakeTodos);
+  on(events.showEditGroupForm, handleShowEditGroupForm);
   on(events.showEditTodoForm, handleShowEditTodoForm);
 }

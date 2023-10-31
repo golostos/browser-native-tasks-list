@@ -11,8 +11,6 @@ export function initDispatchEvent() {
   window.dispatch = dispatchEvent;
 }
 
-
-
 export function on(eventName, callback) {
   document.addEventListener(eventName, (event) => {
     callback(event.detail);
@@ -27,6 +25,7 @@ export const events = {
   removeAllTodos: "remove-all-todos",
   getFakeTodos: "get-fake-todos",
   showEditTodoForm: "show-edit-todo-form",
+  showEditGroupForm: "show-edit-group-form",
 };
 
 export function onBase(eventName, details) {
@@ -39,6 +38,7 @@ export const onToggleTodo = partial(onBase, events.toggleTodo);
 /** @type {(details: RemoveTodoParams) => void} */
 export const onRemoveTodo = partial(onBase, events.removeTodo);
 
+/** @type {(details: RemoveGroupParams) => void} */
 export const onRemoveGroup = partial(onBase, events.removeGroup);
 
 export const onRemoveAllGroups = partial(onBase, events.removeAllGroups);
@@ -51,3 +51,6 @@ export const onGetFakeTodos = partial(onBase, events.getFakeTodos);
 
 /** @type {(details: ShowEditTodoFormParams) => void} */
 export const onShowEditTodoForm = partial(onBase, events.showEditTodoForm);
+
+/** @type {(details: ShowEditGroupFormParams) => void} */
+export const onShowEditGroupForm = partial(onBase, events.showEditGroupForm);

@@ -41,16 +41,16 @@ function router() {
   switch (true) {
     case hash === "":
       return renderGroups();
-    case /^#\/edit\/\d+/.test(hash):
-      return Maybe.of(hash.match(/^#\/todos\/(\d+)\/edit\/(\d+)/))
+    case /^#\/todos\/\d+\/edit/.test(hash):
+      return Maybe.of(hash.match(/^#\/todos\/(\d+)\/edit/))
         .bind(([, groupId]) => getGroup({
           id: Number(groupId)
         }))
         .bind(group => renderEditGroupForm(group))
         .catch(() => renderNotFound())
         .get();
-    case /^#\/todos\/\d+\/edit\/\d+/.test(hash):
-      return Maybe.of(hash.match(/^#\/todos\/(\d+)\/edit\/(\d+)/))
+    case /^#\/todos\/\d+\/\d+\/edit/.test(hash):
+      return Maybe.of(hash.match(/^#\/todos\/(\d+)\/(\d+)\/edit/))
         .bind(([, groupId, todoId]) => getTodo({
           groupId: Number(groupId),
           todoId: Number(todoId),

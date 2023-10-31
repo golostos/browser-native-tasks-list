@@ -1,18 +1,15 @@
 // @ts-check
 /// <reference path="./types.d.ts" />
 
-import { getData, getTodo, getTodoGroups, saveTodos } from './data.js';
-import { sanitize } from './helpers.js';
+import { getData, getFakeTodosForUser, getGroup, getTodo, getTodoGroups, saveTodos } from './data.js';
+import { Maybe, sanitize } from './helpers.js';
 import { getTodoGroupsTemplate, getTodosTemplate } from './renders.js';
 
 /**
  * @param {Event} event 
  */
 export function handleAddTodoGroup(event) {
-  event.preventDefault();
-  const form = event.target;
-  if (!(form instanceof HTMLFormElement)) return;
-  const { title, description } = handleForm(form);
+  const { values: { title, description } } = handleForm(event)
   if (title && description) {
     const todos = getTodoGroups();
     const newGroup = {
@@ -33,10 +30,7 @@ export function handleAddTodoGroup(event) {
  * @param {Event} event 
  */
 export function handleAddTodo(event) {
-  event.preventDefault();
-  const form = event.target;
-  if (!(form instanceof HTMLFormElement)) return;
-  const { title, description } = handleForm(form);
+  const { values: { title, description }, form } = handleForm(event)
   if (title && description) {
     const groupId = form.closest(".todos")?.dataset?.groupId;
     const { todos, group } = getData({ groupId });
@@ -60,10 +54,7 @@ export function handleAddTodo(event) {
  * @param {Event} event 
  */
 export function handleEditTodo(event) {
-  event.preventDefault();  
-  const form = event.target;
-  if (!(form instanceof HTMLFormElement)) return;
-  const { title, description, done } = handleForm(form)
+  const { values: { title, description, done }, form } = handleForm(event)
   const groupId = Number(form.dataset.groupId)
   const todoId = Number(form.dataset.todoId)
   const todo = getTodo({ groupId, todoId });
@@ -76,9 +67,46 @@ export function handleEditTodo(event) {
 }
 
 /**
- * @param {HTMLFormElement} form 
+ * @param {Event} event 
  */
-export function handleForm(form) {
+export function handleEditGroup(event) {
+  const { values: { title, description }, form } = handleForm(event)
+  const groupId = Number(form.dataset.groupId)
+  const group = getTodoGroups().find(group => group.id === groupId);
+  if (!group) return;
+  group.title = title;
+  group.description = description;
+  saveTodos();
+  window.location.hash = `#/todos/${groupId}`
+}
+
+/**
+ * @param {Event} event 
+ */
+export async function handleSelectFakeTodos(event) {
+  const { values: { userId }, form } = handleForm(event)
+  const groupId = Number(form.dataset.groupId)
+  Maybe.of(await getFakeTodosForUser(Number(userId)))
+    .bind(todos => todos.map(todo => ({ ...todo, groupId })))
+    .do(todos => {
+      const group = getGroup({ id: groupId });
+      if (!group) return null;
+      group.todos = group.todos.concat(todos);
+      saveTodos();
+      const todoList = document.querySelector(".todos__list");
+      if (!todoList) return null;
+      todoList.insertAdjacentHTML("beforeend", getTodosTemplate({ ...group, todos }));
+    })
+}
+
+/**
+ * @param {Event} event 
+ */
+export function handleForm(event) {
+  event.preventDefault();
+  const form = event.target;
+  if (!(form instanceof HTMLFormElement)) throw new Error("form is not an instance of HTMLFormElement");
+  /** @type {{[key: string]: string}} */
   const values = {};
   /** @type {NodeListOf<HTMLInputElement | HTMLSelectElement>} */
   const inputs = form.querySelectorAll('input[name],select[name]');
@@ -86,5 +114,5 @@ export function handleForm(form) {
     values[input.name] = sanitize(input.value);
     input.value = "";
   });
-  return values;
+  return { values, form };
 }

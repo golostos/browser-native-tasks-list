@@ -2,8 +2,8 @@
 /// <reference path="./types.d.ts" />
 
 import { getTodoGroups } from './data.js';
-import { onGetFakeTodos, onRemoveAllTodos, onRemoveTodo, onShowEditTodoForm, onToggleTodo } from './events.js';
-import { handleAddTodo, handleAddTodoGroup, handleEditTodo } from './form-handlers.js';
+import { onGetFakeTodos, onRemoveAllGroups, onRemoveAllTodos, onRemoveGroup, onRemoveTodo, onShowEditGroupForm, onShowEditTodoForm, onToggleTodo } from './events.js';
+import { handleAddTodo, handleAddTodoGroup, handleEditGroup, handleEditTodo } from './form-handlers.js';
 import { fragment } from './helpers.js';
 import { addIcon, backIcon, doneIcon, downloadIcon, editIcon, showIcon, progressIcon, removeIcon, hideIcon, homeIcon } from "./icons.js";
 
@@ -20,7 +20,7 @@ export function renderGroups() {
       <div class="header">
         <h1 class="title header__title">Todos list</h1>
         <div class="header__toolbar toolbar">
-          <button class="button button_danger" data-action="remove-all-groups">
+          <button class="button button_danger" onclick="${onRemoveAllGroups()}">
             ${removeIcon()}
             Remove all
           </button>
@@ -66,11 +66,11 @@ export function getTodoGroupsTemplate(groups) {
           </a>
         </div>
         <div class="card__toolbar toolbar">
-          <button class="button button_primary">
+          <button class="button button_primary" onclick="${onShowEditGroupForm({ groupId: group.id })}">
             ${editIcon()}
             Edit
           </button>
-          <button class="button button_danger">
+          <button class="button button_danger" onclick="${onRemoveGroup({ groupId: group.id })}">
             ${removeIcon()}
             Remove
           </button>
@@ -99,7 +99,7 @@ export function renderTodos(group) {
             </div>
             <div class="dropdown__content-wrapper">
               <div class="dropdown__content">
-                <button class="button button_primary" data-action="edit-group">
+                <button class="button button_primary" onclick="${onShowEditGroupForm({ groupId: group.id })}">
                   ${editIcon()}
                   Edit
                 </button>
@@ -111,7 +111,7 @@ export function renderTodos(group) {
                   ${removeIcon()}
                   Remove all
                 </button>
-                <button class="button button_danger" data-action="remove-group">
+                <button class="button button_danger" onclick="${onRemoveGroup({ groupId: group.id })}">
                   ${removeIcon()}
                   Remove group
                 </button>
@@ -225,7 +225,7 @@ export function renderEditTodoForm(todo) {
  * @returns 
  */
 export function renderEditGroupForm(group) {
-  return fragment/*html*/`
+  const page =  fragment/*html*/`
     <h1 class="title container__title">Edit todo</h1>
     <form class="edit-form todo-edit-form" data-group-id=${group.id}>
       <label class="edit-form__form-label form-label">
@@ -246,6 +246,8 @@ export function renderEditGroupForm(group) {
       </button>
     </form>
   `;
+  page.querySelector('.edit-form')?.addEventListener("submit", handleEditGroup);
+  return page;
 }
 
 /**
@@ -261,6 +263,32 @@ export function renderModal(content) {
     </div>
   `
 }
+
+/**
+ * 
+ * @param {User[]} users
+ * @param {number} groupId
+ */
+export function renderGetFakeTodosSelector(users, groupId) {
+  return /*html*/`
+    <h1 class="title container__title">Select user for import</h1>
+    <form class="edit-form todo-edit-form" data-group-id=${groupId}>
+      <label class="edit-form__form-label form-label">
+        <span class="edit-form__form-label-text">Select user for import</span>
+        <select class="input" name="userid">
+          ${users.map(user => {
+            return `<option value="${user.id}" ${user.id === 1 ? 'selected' : ''}>${user.name}</option>`
+          })}
+        </select>
+      </label>
+      <button class="button button_secondary edit-form__edit-button" type="submit">
+        ${downloadIcon()}
+        Import
+      </button>
+    </form>
+  `;
+}
+
 
 /**
  * @param {User[]} users 

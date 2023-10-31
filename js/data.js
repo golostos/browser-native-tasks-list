@@ -103,7 +103,9 @@ export function getData({ groupId, todoId = null }) {
  * @param {Todos?} todos 
  */
 export function saveTodos(todos = null) {
-  localStorage.setItem("todos", JSON.stringify(todos ?? getTodoGroups()));
+  todos ??= getTodoGroups();
+  window.todos = todos;
+  localStorage.setItem("todos", JSON.stringify(todos));  
 }
 
 /**

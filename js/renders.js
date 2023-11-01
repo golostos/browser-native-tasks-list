@@ -2,7 +2,7 @@
 /// <reference path="./types.d.ts" />
 
 import { getTodoGroups } from './data.js';
-import { onGetFakeTodos, onRemoveAllGroups, onRemoveAllTodos, onRemoveGroup, onRemoveTodo, onShowEditGroupForm, onShowEditTodoForm, onToggleTodo } from './events.js';
+import { dispatchShowGetFakeTodos, dispatchRemoveAllGroups, dispatchRemoveAllTodos, dispatchRemoveGroup, dispatchRemoveTodo, dispatchShowEditGroupForm, dispatchShowEditTodoForm, dispatchToggleTodo } from './events.js';
 import { handleAddTodo, handleAddTodoGroup, handleEditGroup, handleEditTodo } from './form-handlers.js';
 import { fragment } from './helpers.js';
 import { addIcon, backIcon, doneIcon, downloadIcon, editIcon, showIcon, progressIcon, removeIcon, hideIcon, homeIcon } from "./icons.js";
@@ -20,7 +20,7 @@ export function renderGroups() {
       <div class="header">
         <h1 class="title header__title">Todos list</h1>
         <div class="header__toolbar toolbar">
-          <button class="button button_danger" onclick="${onRemoveAllGroups()}">
+          <button class="button button_danger" onclick="${dispatchRemoveAllGroups()}">
             ${removeIcon()}
             Remove all
           </button>
@@ -57,7 +57,7 @@ export function getTodoGroupsTemplate(groups) {
   return groups.map(group => {
     return /*html*/`
       <div class="card group" data-id="${group.id}">
-        <div class="card__card-header card-header">          
+        <div class="card__card-header card-header">
           <a class="card__link link" href="#/todos/${group.id}">
             <h3 class="card-title card__card-title group__title">
               ${group.title}
@@ -66,11 +66,11 @@ export function getTodoGroupsTemplate(groups) {
           </a>
         </div>
         <div class="card__toolbar toolbar">
-          <button class="button button_primary" onclick="${onShowEditGroupForm({ groupId: group.id })}">
+          <button class="button button_primary" onclick="${dispatchShowEditGroupForm({ groupId: group.id })}">
             ${editIcon()}
             Edit
           </button>
-          <button class="button button_danger" onclick="${onRemoveGroup({ groupId: group.id })}">
+          <button class="button button_danger" onclick="${dispatchRemoveGroup({ groupId: group.id })}">
             ${removeIcon()}
             Remove
           </button>
@@ -99,19 +99,19 @@ export function renderTodos(group) {
             </div>
             <div class="dropdown__content-wrapper">
               <div class="dropdown__content">
-                <button class="button button_primary" onclick="${onShowEditGroupForm({ groupId: group.id })}">
+                <button class="button button_primary" onclick="${dispatchShowEditGroupForm({ groupId: group.id })}">
                   ${editIcon()}
                   Edit
                 </button>
-                <button class="button button_secondary" onclick="${onGetFakeTodos({ groupId: group.id, userId: 1 })}">
+                <button class="button button_secondary" onclick="${dispatchShowGetFakeTodos({ groupId: group.id })}">
                   ${downloadIcon()}
                   Fake todos
                 </button>
-                <button class="button button_danger" onclick="${onRemoveAllTodos({ groupId: group.id })}">
+                <button class="button button_danger" onclick="${dispatchRemoveAllTodos({ groupId: group.id })}">
                   ${removeIcon()}
                   Remove all
                 </button>
-                <button class="button button_danger" onclick="${onRemoveGroup({ groupId: group.id })}">
+                <button class="button button_danger" onclick="${dispatchRemoveGroup({ groupId: group.id })}">
                   ${removeIcon()}
                   Remove group
                 </button>
@@ -155,7 +155,7 @@ export function getTodosTemplate(group) {
     return /*html*/`      
       <div class="card todo" data-id="${todo.id}">
         <div class="card__card-header card-header todo-header ${todo.done ? 'todo-header_done' : ''}" 
-          onclick="${onToggleTodo({ groupId: group.id, todoId: todo.id })}">
+          onclick="${dispatchToggleTodo({ groupId: group.id, todoId: todo.id })}">
           <h3 class="card-title card__card-title todo__title ${todo.done ? 'todo-title_done' : ''}">
             ${todo.title}
           </h3>
@@ -168,11 +168,11 @@ export function getTodosTemplate(group) {
           <div class="card__description description">${todo.description}</div>
         </div>
         <div class="card__toolbar toolbar">
-          <button class="button button_primary" onclick="${onShowEditTodoForm({ groupId: group.id, todoId: todo.id })}">
+          <button class="button button_primary" onclick="${dispatchShowEditTodoForm({ groupId: group.id, todoId: todo.id })}">
             ${editIcon()}
             Edit
           </button>
-          <button class="button button_danger" onclick="${onRemoveTodo({ groupId: group.id, todoId: todo.id })}">
+          <button class="button button_danger" onclick="${dispatchRemoveTodo({ groupId: group.id, todoId: todo.id })}">
             ${removeIcon()}
             Remove
           </button>
@@ -255,9 +255,9 @@ export function renderEditGroupForm(group) {
  * @param {string} content 
  */
 export function renderModal(content) {
-  return /*html*/`
-    <div className="modal">
-      <div className="modal__content">
+  return fragment/*html*/`
+    <div class="modal">
+      <div class="modal__content">
         ${content}
       </div>
     </div>
@@ -266,16 +266,16 @@ export function renderModal(content) {
 
 /**
  * 
- * @param {User[]} users
+ * @param {FakeUser[]} users
  * @param {number} groupId
  */
-export function renderGetFakeTodosSelector(users, groupId) {
+export function renderGetTodosForm(users, groupId) {
   return /*html*/`
-    <h1 class="title container__title">Select user for import</h1>
+    <h2 class="title container__title">Select user for import</h2>
     <form class="edit-form todo-edit-form" data-group-id=${groupId}>
       <label class="edit-form__form-label form-label">
         <span class="edit-form__form-label-text">Select user for import</span>
-        <select class="input" name="userid">
+        <select class="input" name="userId">
           ${users.map(user => {
             return `<option value="${user.id}" ${user.id === 1 ? 'selected' : ''}>${user.name}</option>`
           })}
@@ -283,31 +283,6 @@ export function renderGetFakeTodosSelector(users, groupId) {
       </label>
       <button class="button button_secondary edit-form__edit-button" type="submit">
         ${downloadIcon()}
-        Import
-      </button>
-    </form>
-  `;
-}
-
-
-/**
- * @param {User[]} users 
- * @returns 
- */
-export function renderGetTodosForm(users) {
-  return /*html*/`
-    <h1 class="title container__title">Edit todo</h1>
-    <form class="edit-form todo-edit-form">
-      <label class="edit-form__form-label form-label">
-        <span class="edit-form__form-label-text">Select user for import</span>
-        <select class="input" name="done">
-          ${users.map(user => {
-            return `<option value="${user.id}" ${user.id === 1 ? 'selected' : ''}>${user.name}</option>`
-          })}
-        </select>
-      </label>
-      <button class="button button_primary edit-form__edit-button" type="submit">
-        ${editIcon()}
         Import
       </button>
     </form>

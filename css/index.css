@@ -380,10 +380,11 @@ body {
   border-radius: 0.25rem;
   padding: 1rem;
   width: 100%;
-  max-width: 600px;
+  max-width: 400px;
+  opacity: 0;
 }
 
-.modal__content_enter{
+.modal_enter .modal__content {
   animation: modal-content-open 0.3s ease 0.3s 1 normal forwards;
 }
 

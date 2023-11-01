@@ -23,34 +23,38 @@ export const events = {
   removeGroup: "remove-group",
   removeAllGroups: "remove-all-groups",
   removeAllTodos: "remove-all-todos",
-  getFakeTodos: "get-fake-todos",
+  showGetFakeTodos: "show-get-fake-todos",
   showEditTodoForm: "show-edit-todo-form",
   showEditGroupForm: "show-edit-group-form",
 };
 
-export function onBase(eventName, details) {
+/**
+ * @param {string} eventName
+ * @param {any} details
+ */
+export function baseDispatch(eventName, details) {
   return `dispatch('${eventName}', ${toJson(details)})`
 }
 
 /** @type {(details: ToggleTodoParams) => void} */
-export const onToggleTodo = partial(onBase, events.toggleTodo);
+export const dispatchToggleTodo = partial(baseDispatch, events.toggleTodo);
 
 /** @type {(details: RemoveTodoParams) => void} */
-export const onRemoveTodo = partial(onBase, events.removeTodo);
+export const dispatchRemoveTodo = partial(baseDispatch, events.removeTodo);
 
 /** @type {(details: RemoveGroupParams) => void} */
-export const onRemoveGroup = partial(onBase, events.removeGroup);
+export const dispatchRemoveGroup = partial(baseDispatch, events.removeGroup);
 
-export const onRemoveAllGroups = partial(onBase, events.removeAllGroups);
+export const dispatchRemoveAllGroups = partial(baseDispatch, events.removeAllGroups);
 
 /** @type {(details: RemoveAllTodosParams) => void} */
-export const onRemoveAllTodos = partial(onBase, events.removeAllTodos);
+export const dispatchRemoveAllTodos = partial(baseDispatch, events.removeAllTodos);
 
-/** @type {(details: GetFakeTodosParams) => void} */
-export const onGetFakeTodos = partial(onBase, events.getFakeTodos);
+/** @type {(details: ShowGetFakeTodosParams) => void} */
+export const dispatchShowGetFakeTodos = partial(baseDispatch, events.showGetFakeTodos);
 
 /** @type {(details: ShowEditTodoFormParams) => void} */
-export const onShowEditTodoForm = partial(onBase, events.showEditTodoForm);
+export const dispatchShowEditTodoForm = partial(baseDispatch, events.showEditTodoForm);
 
 /** @type {(details: ShowEditGroupFormParams) => void} */
-export const onShowEditGroupForm = partial(onBase, events.showEditGroupForm);
+export const dispatchShowEditGroupForm = partial(baseDispatch, events.showEditGroupForm);

@@ -23,6 +23,7 @@ function themeToggle() {
 
 function renderThemeToggle() {
   document.body.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element)) return;
     const themeBtn = e.target.closest(".theme-toggle__button");
     if (themeBtn) {
       themeToggle();

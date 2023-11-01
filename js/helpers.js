@@ -110,3 +110,32 @@ export function fragment(strings, ...values) {
   template.innerHTML = dirty;
   return template.content;
 }
+
+/**
+ * 
+ * @param {Element} modal 
+ */
+export function removeAnimatedModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('modal_open');
+  modal.classList.add('modal_close');
+  modal.addEventListener('animationend', () => {
+    modal.remove();
+  });
+}
+
+/**
+ * 
+ * @param {Element} modal 
+ */
+export function initModalCloseHandler(modal) {
+  /** @type {(event: KeyboardEvent) => void} */
+  const keyHandler = (event) => {
+    if (event.key === "Escape") removeAnimatedModal(modal)
+  }
+  modal.addEventListener("click", (event) => {
+    if (event.target == modal) removeAnimatedModal(modal)
+    document.body.removeEventListener("keydown", keyHandler);
+  });
+  document.body.addEventListener("keydown", keyHandler);
+}

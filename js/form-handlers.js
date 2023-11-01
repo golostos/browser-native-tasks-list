@@ -82,8 +82,9 @@ export function handleEditGroup(event) {
 
 /**
  * @param {Event} event 
+ * @param {Function?} callback
  */
-export async function handleSelectFakeTodos(event) {
+export async function handleGetFakeTodos(event, callback) {
   const { values: { userId }, form } = handleForm(event)
   const groupId = Number(form.dataset.groupId)
   Maybe.of(await getFakeTodosForUser(Number(userId)))
@@ -93,6 +94,7 @@ export async function handleSelectFakeTodos(event) {
       if (!group) return null;
       group.todos = group.todos.concat(todos);
       saveTodos();
+      if (callback) callback();
       const todoList = document.querySelector(".todos__list");
       if (!todoList) return null;
       todoList.insertAdjacentHTML("beforeend", getTodosTemplate({ ...group, todos }));

@@ -1,11 +1,12 @@
 // @ts-check
 /// <reference path="./types.d.ts" />
 
-import { getFakeTodosForUser, getGroup, getTodo, getTodoGroups, saveTodos } from './data.js';
+import { getFakeTodosForUser, getFakeUsers, getGroup, getTodo, getTodoGroups, saveTodos } from './data.js';
 import { events, initDispatchEvent, on } from './events.js';
-import { Maybe, compose, getFullHeightOfChildren } from './helpers.js';
+import { handleGetFakeTodos } from './form-handlers.js';
+import { Maybe, compose, getFullHeightOfChildren, initModalCloseHandler, removeAnimatedModal } from './helpers.js';
 import { doneIcon, hideIcon, progressIcon, showIcon } from './icons.js';
-import { getTodosTemplate } from './renders.js';
+import { getTodosTemplate, renderGetTodosForm, renderModal } from './renders.js';
 
 export function handleDropdown(event) {
   const dropdown = event.target.closest(".dropdown");
@@ -109,7 +110,7 @@ function handleRemoveAllGroups() {
 /**
  * 
  * @param {RemoveAllTodosParams} details 
- */
+ */ 
 function handleRemoveAllTodos({ groupId }) {
   if (!confirm("Are you sure?")) return;
   Maybe.of(getGroup({ id: groupId }))
@@ -121,31 +122,32 @@ function handleRemoveAllTodos({ groupId }) {
 
 /**
  * 
- * @param {GetFakeTodosParams} details 
+ * @param {ShowGetFakeTodosParams} details 
  */
-async function handleGetFakeTodos({ groupId, userId }) {
-  Maybe.of(await getFakeTodosForUser(userId))
-    .bind(todos => todos.map(todo => ({ ...todo, groupId })))
-    .do(todos => {
-      const group = getGroup({ id: groupId });
-      if (!group) return null;
-      group.todos = group.todos.concat(todos);
-      saveTodos();
-      const todoList = document.querySelector(".todos__list");
-      if (!todoList) return null;
-      todoList.insertAdjacentHTML("beforeend", getTodosTemplate({ ...group, todos }));
+async function handleShowGetFakeTodos({ groupId }) {
+  Maybe.of(await getFakeUsers())
+    .bind(users => renderModal(renderGetTodosForm(users, groupId)))
+    .bind(modal => modal.querySelector(".modal"))
+    .do(modal => {
+      modal.classList.add("modal_enter");
+      document.body.append(modal);
+      initModalCloseHandler(modal);
+      const form = modal.querySelector("form");
+      if (!form) return null;
+      form.addEventListener("submit", (e) =>
+        handleGetFakeTodos(e, () => removeAnimatedModal(modal)))
     })
+    .catch(() => alert("Something went wrong. Try again later."))
 }
 
 export function initCustomEvents() {
   initDispatchEvent();
-  // on(events.editGroup, handleEditGroup);
   on(events.toggleTodo, handleToggleTodo);
   on(events.removeTodo, handleRemoveTodo);
   on(events.removeGroup, handleRemoveGroup);
   on(events.removeAllGroups, handleRemoveAllGroups);
   on(events.removeAllTodos, handleRemoveAllTodos);
-  on(events.getFakeTodos, handleGetFakeTodos);
+  on(events.showGetFakeTodos, handleShowGetFakeTodos);
   on(events.showEditGroupForm, handleShowEditGroupForm);
   on(events.showEditTodoForm, handleShowEditTodoForm);
 }

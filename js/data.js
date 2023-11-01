@@ -129,3 +129,25 @@ export async function getFakeTodosForUser(id) {
     return [];
   }
 }
+
+/**
+ * 
+ * @returns {Promise<FakeUser[] | null>}
+ */
+export async function getFakeUsers() {
+  try {
+    const response = await fetch(`https://jsonplaceholder.typicode.com/users`);
+    if (!response.ok) throw new Error('Error fetching users');
+    /** @type {User[]} */
+    const users = await response.json();
+    return users.map(user => {
+      return {
+        id: user.id,
+        name: user.name,
+      };
+    });
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}

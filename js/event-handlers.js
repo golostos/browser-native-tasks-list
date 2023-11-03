@@ -71,6 +71,15 @@ function handleToggleTodo({ groupId, todoId }) {
     .do(subtitle => subtitle.classList.toggle("todo-title_done"))
     .bind(() => document.querySelector(`.todo[data-id="${todoId}"] .status__text`))
     .do(status => status.innerHTML = todo.done ? `${doneIcon()} Done` : `${progressIcon()} In progress`)
+    .bind(() => document.querySelector(`#todo-filter`))
+    .bind(filter => filter instanceof HTMLSelectElement ? filter.value : null)
+    .do(filter => {
+      if (filter === 'all') return;
+      const todoElement = document.querySelector(`.todo[data-id="${todoId}"]`);
+      if (!todoElement) return;
+      if (filter === 'true' && !todo.done) todoElement.remove();
+      else if (filter === 'false' && todo.done) todoElement.remove();
+    })
 }
 
 /**

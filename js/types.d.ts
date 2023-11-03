@@ -61,6 +61,11 @@ type GetTodoParams = {
   group?: Group | null;
 };
 
+type FilterTodosParams = {
+  groupId: number;
+  done: string;
+};
+
 type Todo = {
   id: number;
   groupId: number;

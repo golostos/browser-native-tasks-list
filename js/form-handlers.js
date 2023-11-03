@@ -44,6 +44,9 @@ export function handleAddTodo(event) {
     };
     group.todos.push(newTodo);
     saveTodos(todos);
+    // check todo-filter
+    const todoFilter = document.querySelector("#todo-filter");
+    if (todoFilter instanceof HTMLSelectElement && todoFilter.value === "true") return;
     const todoList = document.querySelector(".todos__list");
     if (!todoList) return;
     todoList.insertAdjacentHTML("beforeend", getTodosTemplate({ ...group, todos: [newTodo] }));
@@ -95,9 +98,14 @@ export async function handleGetFakeTodos(event, callback) {
       group.todos = group.todos.concat(todos);
       saveTodos();
       if (callback) callback();
-      const todoList = document.querySelector(".todos__list");
-      if (!todoList) return null;
-      todoList.insertAdjacentHTML("beforeend", getTodosTemplate({ ...group, todos }));
+      Maybe.of(document.querySelector("#todo-filter"))
+        .bind(filter => filter instanceof HTMLSelectElement ? filter.value : null)
+        .bind(filter => todos.filter(todo => filter === 'all' || String(todo.done) === filter))
+        .do(todos => {
+          const todoList = document.querySelector(".todos__list");
+          if (!todoList) return null;
+          todoList.insertAdjacentHTML("beforeend", getTodosTemplate({ ...group, todos }));
+        })
     })
 }
 

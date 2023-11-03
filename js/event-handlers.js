@@ -110,7 +110,7 @@ function handleRemoveAllGroups() {
 /**
  * 
  * @param {RemoveAllTodosParams} details 
- */ 
+ */
 function handleRemoveAllTodos({ groupId }) {
   if (!confirm("Are you sure?")) return;
   Maybe.of(getGroup({ id: groupId }))
@@ -149,6 +149,21 @@ function handleNoItems() {
     .catch(() => console.log("Something went wrong. Try again later."))
 }
 
+/**
+ * @param {FilterTodosParams} details
+ */
+function handleFilterTodos({ groupId, done }) {
+  const group = getGroup({ id: groupId });
+  if (!group) return;
+  const todoList = document.querySelector(".todos__list");
+  if (!todoList) return;
+  todoList.innerHTML = getTodosTemplate({
+    ...group,
+    todos: group.todos.filter(todo => done === 'all' || String(todo.done) === done),
+  });
+}
+
+
 export function initCustomEvents() {
   initDispatchEvent();
   on(events.toggleTodo, handleToggleTodo);
@@ -159,6 +174,7 @@ export function initCustomEvents() {
   on(events.showGetFakeTodos, handleShowGetFakeTodos);
   on(events.showEditGroupForm, handleShowEditGroupForm);
   on(events.showEditTodoForm, handleShowEditTodoForm);
+  on(events.filterTodos, handleFilterTodos);
 }
 
 /**
@@ -181,7 +197,7 @@ export function observeList(list) {
               .filter(node => node instanceof HTMLElement)
               .some(node => node.classList.contains("list__item"))
           })) noEntries.remove()
-        }) 
+        })
     }
   });
   observer.observe(list, {

@@ -32,6 +32,7 @@ export const events = {
   showEditTodoForm: "show-edit-todo-form",
   showEditGroupForm: "show-edit-group-form",
   groupHasNoTodos: "group-has-no-todos",
+  filterTodos: "filter-todos",
 };
 
 /**
@@ -39,7 +40,7 @@ export const events = {
  * @param {any} details
  */
 export function baseDispatch(eventName, details) {
-  return `dispatch('${eventName}', ${toJson(details)})`
+  return `window.dispatch?.call(null, '${eventName}', ${toJson(details)})`
 }
 
 /** @type {(details: ToggleTodoParams) => void} */

@@ -143,6 +143,16 @@ export function renderTodos(group) {
           <button class="button button_primary create-form__add-button" type="submit">Add</button>
         </form>
       </div>
+      <div class="todo-filter">
+        <label class="todo-filter__label">
+          <span class="todo-filter__label-text">Filter by status</span>
+          <select class="input" id="todo-filter" name="done" onchange="window.dispatch?.call(null, 'filter-todos', {groupId: ${group.id}, done: this.value})">
+            <option value="all" selected>All</option>
+            <option value="true">Done</option>
+            <option value="false">In progress</option>
+          </select>
+        </label>
+      </div>
       <div class="todos__list list">
         ${group.todos.length === 0
       ? /*html*/`<h5 class="no-entries">No groups yet. Add new one using the form above.</h5>`

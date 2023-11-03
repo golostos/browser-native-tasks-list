@@ -3,7 +3,7 @@
 
 import { getGroup, getTodo, getTodoGroupById } from './data.js';
 import { handleClick, initCustomEvents } from './event-handlers.js';
-import { Maybe } from './helpers.js';
+import { Maybe, fixHeightForm, getFullHeightOfChildren } from './helpers.js';
 import { renderGroups, renderTodos, renderNotFound, renderEditTodoForm, renderEditGroupForm } from './renders.js';
 import {initTheme} from "./theme.js";
 
@@ -27,13 +27,14 @@ function start() {
   root.addEventListener("click", handleClick);
   initTheme()
   initCustomEvents()
+  fixHeightForm()
 }
 
 window.addEventListener("hashchange", () => {
   const container = document.querySelector(".content");
   if (!container) return;
-  // container.innerHTML = router();
   container.replaceChildren(router());
+  fixHeightForm()
 });
 
 function router() {

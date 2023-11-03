@@ -1,7 +1,5 @@
 interface Window {
-  modals?: Map<string, DocumentFragment>;
-  dispatch: (eventName: string, detail: any) => void
-  todos?: Todos;
+  dispatch: (eventName: string, detail?: Record<string, any>) => void
 }
 
 type BaseTodoParams = {
@@ -36,6 +34,10 @@ type ShowGetFakeTodosParams = {
   groupId: number;
 };
 
+type GroupHasNoTodosParams = {
+  groupId: number;
+};
+
 type GetDataParams = {
   groupId: number;
   todoId?: number | null;
@@ -50,7 +52,7 @@ type ServerTodo = {
 
 type GetGroupParams = {
   id: number;
-  todos?: Todos | null;
+  todos?: TodoGroups | null;
 }
 
 type GetTodoParams = {
@@ -74,7 +76,7 @@ type Group = {
   todos: Todo[];
 }
 
-type Todos = Group[];
+type TodoGroups = Group[];
 
 type FakeUser = {
   id: number;

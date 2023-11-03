@@ -2,9 +2,10 @@
 /// <reference path="./types.d.ts" />
 
 import { getTodoGroups } from './data.js';
+import { observeList } from './event-handlers.js';
 import { dispatchShowGetFakeTodos, dispatchRemoveAllGroups, dispatchRemoveAllTodos, dispatchRemoveGroup, dispatchRemoveTodo, dispatchShowEditGroupForm, dispatchShowEditTodoForm, dispatchToggleTodo } from './events.js';
 import { handleAddTodo, handleAddTodoGroup, handleEditGroup, handleEditTodo } from './form-handlers.js';
-import { fragment } from './helpers.js';
+import { Maybe, fragment, getFullHeightOfChildren } from './helpers.js';
 import { addIcon, backIcon, doneIcon, downloadIcon, editIcon, showIcon, progressIcon, removeIcon, hideIcon, homeIcon } from "./icons.js";
 
 export function renderNotFound() {
@@ -25,11 +26,11 @@ export function renderGroups() {
             Remove all
           </button>
           <button class="button button_secondary toolbar__hide-button" id="minimize-button">
-            ${document.querySelector(".create-form")?.offsetHeight > 0
-              ? 'Hide ' + hideIcon() : 'Show ' + showIcon()}
+            ${document.querySelector(".create-form")?.offsetHeight > 0 || groups.length === 0
+      ? 'Hide ' + hideIcon() : 'Show ' + showIcon()}
           </button>
         </div>
-        <form class="groups__create-form create-form">
+        <form class="groups__create-form create-form" style="height: ${groups.length === 0 ? 'auto' : 0}">
           <label class="create-form__form-label form-label">
             <span class="create-form__form-label-text">Add new group</span>
             <input class="input" type="text" placeholder="Add group title" name="title" ${validation('title')}>
@@ -49,14 +50,17 @@ export function renderGroups() {
       </div>
     </div>
   `;
-  page.querySelector('.create-form')?.addEventListener("submit", handleAddTodoGroup);
+  Maybe.of(page.querySelector('.create-form'))
+    .bind(form => form instanceof HTMLFormElement ? form : null)
+    .do(form => form.addEventListener("submit", handleAddTodoGroup))
+  Maybe.of(page.querySelector('.list')).do(observeList)
   return page;
 }
 
 export function getTodoGroupsTemplate(groups) {
   return groups.map(group => {
     return /*html*/`
-      <div class="card group" data-id="${group.id}">
+      <div class="list__item card group" data-id="${group.id}">
         <div class="card__card-header card-header">
           <a class="card__link link" href="#/todos/${group.id}">
             <h3 class="card-title card__card-title group__title">
@@ -80,6 +84,10 @@ export function getTodoGroupsTemplate(groups) {
   }).join("");
 }
 
+/**
+ * 
+ * @param {Group} group
+ */
 export function renderTodos(group) {
   const page = fragment/*html*/`
     <div class="todos" data-group-id="${group.id}">
@@ -119,11 +127,11 @@ export function renderTodos(group) {
             </div>
           </div>
           <button class="button button_secondary toolbar__hide-button" id="minimize-button">
-            ${document.querySelector(".create-form")?.offsetHeight > 0
+            ${document.querySelector(".create-form")?.offsetHeight > 0 || group.todos.length === 0
       ? 'Hide ' + hideIcon() : 'Show ' + showIcon()}
           </button>
         </div>
-        <form class="todos__create-form create-form">
+        <form class="todos__create-form create-form" style="height: ${group.todos.length === 0 ? 'auto' : 0}">
           <label class="create-form__form-label form-label">
             <span class="create-form__form-label-text">Add new todo</span>
             <input class="input" type="text" placeholder="Add todo title" name="title" ${validation('title')}>
@@ -136,11 +144,15 @@ export function renderTodos(group) {
         </form>
       </div>
       <div class="todos__list list">
-        ${getTodosTemplate(group)}
+        ${group.todos.length === 0
+      ? /*html*/`<h5 class="no-entries">No groups yet. Add new one using the form above.</h5>`
+      : getTodosTemplate(group)
+    }
       </div>
     </div>
     `
   page.querySelector('.create-form')?.addEventListener("submit", handleAddTodo);
+  Maybe.of(page.querySelector('.list')).do(observeList)
   return page;
 }
 
@@ -152,8 +164,8 @@ export function renderTodos(group) {
 export function getTodosTemplate(group) {
   const { todos } = group;
   return todos.map(todo => {
-    return /*html*/`      
-      <div class="card todo" data-id="${todo.id}">
+    return /*html*/`
+      <div class="list__item card todo" data-id="${todo.id}">
         <div class="card__card-header card-header todo-header ${todo.done ? 'todo-header_done' : ''}" 
           onclick="${dispatchToggleTodo({ groupId: group.id, todoId: todo.id })}">
           <h3 class="card-title card__card-title todo__title ${todo.done ? 'todo-title_done' : ''}">
@@ -225,7 +237,7 @@ export function renderEditTodoForm(todo) {
  * @returns 
  */
 export function renderEditGroupForm(group) {
-  const page =  fragment/*html*/`
+  const page = fragment/*html*/`
     <h1 class="title container__title">Edit todo</h1>
     <form class="edit-form todo-edit-form" data-group-id=${group.id}>
       <label class="edit-form__form-label form-label">
@@ -277,8 +289,8 @@ export function renderGetTodosForm(users, groupId) {
         <span class="edit-form__form-label-text">Select user for import</span>
         <select class="input" name="userId">
           ${users.map(user => {
-            return `<option value="${user.id}" ${user.id === 1 ? 'selected' : ''}>${user.name}</option>`
-          })}
+    return `<option value="${user.id}" ${user.id === 1 ? 'selected' : ''}>${user.name}</option>`
+  })}
         </select>
       </label>
       <button class="button button_secondary edit-form__edit-button" type="submit">

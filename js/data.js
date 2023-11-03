@@ -1,5 +1,6 @@
 // @ts-check
 
+import { events } from './events.js';
 import { Maybe } from './helpers.js';
 
 export function getTodoGroupById(id) {
@@ -7,12 +8,15 @@ export function getTodoGroupById(id) {
   return todos.find(group => group.id === Number(id));
 }
 
+/** @type {TodoGroups | null} */
+let todoGroupsStore = null
+
 /**
  * 
  * @returns {Group[]}
  */
 export function getTodoGroups() {
-  const baseTodos = [
+  const baseTodoGroups = [
     {
       id: 1,
       title: "Todolist 1",
@@ -35,19 +39,19 @@ export function getTodoGroups() {
       ]
     }
   ];
-  if ('todos' in window && Array.isArray(window.todos)) return window.todos;
+  if (todoGroupsStore) return todoGroupsStore;
   const todosFromStorage = localStorage.getItem("todos");
   if (todosFromStorage) {
     try {
       // @ts-ignore
-      window.todos = JSON.parse(todosFromStorage);
+      todoGroupsStore = JSON.parse(todosFromStorage);
       // @ts-ignore
-      return window.todos;
+      return todoGroupsStore;
     } catch (e) {
       localStorage.removeItem("todos");
     }
   }
-  return baseTodos;
+  return baseTodoGroups;
 }
 
 /**
@@ -55,7 +59,7 @@ export function getTodoGroups() {
  * @param {GetGroupParams} params
  * @returns 
  */
-export function getGroup({id, todos = null}) {  
+export function getGroup({ id, todos = null }) {
   return Maybe.of(todos ?? getTodoGroups())
     .bind(todos => todos.find(group => group.id === Number(id)))
     .get();
@@ -100,12 +104,15 @@ export function getData({ groupId, todoId = null }) {
 
 /**
  * 
- * @param {Todos?} todos 
+ * @param {TodoGroups?} todoGroups 
  */
-export function saveTodos(todos = null) {
-  todos ??= getTodoGroups();
-  window.todos = todos;
-  localStorage.setItem("todos", JSON.stringify(todos));  
+export function saveTodos(todoGroups = null) {
+  todoGroups ??= getTodoGroups();
+  // todoGroups.forEach(group => {
+  //   if (group.todos.length === 0) window.dispatch(events.groupHasNoTodos, { groupId: group.id });
+  // })
+  todoGroupsStore = todoGroups;
+  localStorage.setItem("todos", JSON.stringify(todoGroups));
 }
 
 /**

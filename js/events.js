@@ -4,7 +4,12 @@
 import { partial, toJson } from './helpers.js';
 
 export function initDispatchEvent() {
-  function dispatchEvent(eventName, detail) {
+  /**
+   * 
+   * @param {string} eventName 
+   * @param {Record<string, any>} [detail] 
+   */
+  function dispatchEvent(eventName, detail = {}) {
     const event = new CustomEvent(eventName, { detail });
     document.dispatchEvent(event);
   }
@@ -26,6 +31,7 @@ export const events = {
   showGetFakeTodos: "show-get-fake-todos",
   showEditTodoForm: "show-edit-todo-form",
   showEditGroupForm: "show-edit-group-form",
+  groupHasNoTodos: "group-has-no-todos",
 };
 
 /**

@@ -139,3 +139,10 @@ export function initModalCloseHandler(modal) {
   });
   document.body.addEventListener("keydown", keyHandler);
 }
+
+export function fixHeightForm() {
+  Maybe.of(document.querySelector('.create-form'))
+    .bind(form => form instanceof HTMLFormElement ? form : null)
+    .bind(form => form.style.height === 'auto' ? form : null)
+    .do(form => form.style.height = getFullHeightOfChildren(form) + "px")
+}

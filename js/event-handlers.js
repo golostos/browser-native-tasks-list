@@ -140,6 +140,15 @@ async function handleShowGetFakeTodos({ groupId }) {
     .catch(() => alert("Something went wrong. Try again later."))
 }
 
+function handleNoItems() {
+  Maybe.of(document.querySelector(".create-form"))
+    .bind(form => form instanceof HTMLFormElement ? form : null)
+    .bind(form => form.style.height = getFullHeightOfChildren(form) + "px")
+    .bind(() => document.querySelector("#minimize-button"))
+    .do(minimizeButton => minimizeButton.innerHTML = 'Hide ' + hideIcon())
+    .catch(() => console.log("Something went wrong. Try again later."))
+}
+
 export function initCustomEvents() {
   initDispatchEvent();
   on(events.toggleTodo, handleToggleTodo);
@@ -150,4 +159,32 @@ export function initCustomEvents() {
   on(events.showGetFakeTodos, handleShowGetFakeTodos);
   on(events.showEditGroupForm, handleShowEditGroupForm);
   on(events.showEditTodoForm, handleShowEditTodoForm);
+}
+
+/**
+ * 
+ * @param {Element} list 
+ */
+export function observeList(list) {
+  if (!(list instanceof HTMLElement)) throw new Error("list is not an instance of HTMLElement");
+  const observer = new MutationObserver((mutations) => {
+    if (mutations.length === 0) return;
+    if (mutations.some(mutation => mutation.type === "childList")) {
+      if (list.children.length === 0) {
+        list.innerHTML = `<h5 class="no-entries">No entries yet. Add new one using the form above.</h5>`;
+        handleNoItems();
+      }
+      else Maybe.of(list.querySelector(".no-entries"))
+        .do(noEntries => {
+          if (mutations.filter(mutation => mutation.type === "childList").some(mutation => {
+            return [...mutation.addedNodes]
+              .filter(node => node instanceof HTMLElement)
+              .some(node => node.classList.contains("list__item"))
+          })) noEntries.remove()
+        }) 
+    }
+  });
+  observer.observe(list, {
+    childList: true,
+  });
 }

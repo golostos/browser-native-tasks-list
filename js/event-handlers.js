@@ -1,7 +1,7 @@
 // @ts-check
 /// <reference path="./types.d.ts" />
 
-import { getFakeTodosForUser, getFakeUsers, getGroup, getTodo, getTodoGroups, saveTodos } from './data.js';
+import { getFakeUsers, getGroup, getTodo, getTodoGroups, saveTodos } from './data.js';
 import { events, initDispatchEvent, on } from './events.js';
 import { handleGetFakeTodos } from './form-handlers.js';
 import { Maybe, compose, getFullHeightOfChildren, initModalCloseHandler, removeAnimatedModal } from './helpers.js';

@@ -5,7 +5,7 @@ import { getTodoGroups } from './data.js';
 import { observeList } from './event-handlers.js';
 import { dispatchShowGetFakeTodos, dispatchRemoveAllGroups, dispatchRemoveAllTodos, dispatchRemoveGroup, dispatchRemoveTodo, dispatchShowEditGroupForm, dispatchShowEditTodoForm, dispatchToggleTodo } from './events.js';
 import { handleAddTodo, handleAddTodoGroup, handleEditGroup, handleEditTodo } from './form-handlers.js';
-import { Maybe, fragment, getFullHeightOfChildren } from './helpers.js';
+import { Maybe, fragment } from './helpers.js';
 import { addIcon, backIcon, doneIcon, downloadIcon, editIcon, showIcon, progressIcon, removeIcon, hideIcon, homeIcon } from "./icons.js";
 
 export function renderNotFound() {

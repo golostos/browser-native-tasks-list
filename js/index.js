@@ -3,7 +3,7 @@
 
 import { getGroup, getTodo, getTodoGroupById } from './data.js';
 import { handleClick, initCustomEvents } from './event-handlers.js';
-import { Maybe, fixHeightForm, getFullHeightOfChildren } from './helpers.js';
+import { Maybe, fixHeightForm } from './helpers.js';
 import { renderGroups, renderTodos, renderNotFound, renderEditTodoForm, renderEditGroupForm } from './renders.js';
 import {initTheme} from "./theme.js";
 

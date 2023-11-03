@@ -1,6 +1,5 @@
 // @ts-check
 
-import { events } from './events.js';
 import { Maybe } from './helpers.js';
 
 export function getTodoGroupById(id) {

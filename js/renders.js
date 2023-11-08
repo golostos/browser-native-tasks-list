@@ -46,7 +46,10 @@ export function renderGroups() {
         </form>
       </div>
       <div class="groups__list list">
-        ${getTodoGroupsTemplate(groups)}
+        ${
+          groups.length === 0
+          ? /*html*/`<h5 class="no-entries">No entries yet. Add new one using the form above.</h5>`
+          : getTodoGroupsTemplate(groups)}
       </div>
     </div>
   `;
@@ -155,7 +158,7 @@ export function renderTodos(group) {
       </div>
       <div class="todos__list list">
         ${group.todos.length === 0
-      ? /*html*/`<h5 class="no-entries">No groups yet. Add new one using the form above.</h5>`
+    ? /*html*/`<h5 class="no-entries">No entries yet. Add new one using the form above.</h5>`
       : getTodosTemplate(group)
     }
       </div>

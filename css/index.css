@@ -391,7 +391,7 @@ body {
 }
 
 .modal_close {
-  animation: modal-close 0.3s ease 0s 1 normal forwards;
+  animation: modal-close 0.3s ease 0.3s 1 normal forwards;
 }
 
 .modal__content {

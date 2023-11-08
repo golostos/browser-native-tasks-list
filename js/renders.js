@@ -19,7 +19,7 @@ export function renderGroups() {
   const page = fragment/*html*/`
     <div class="groups">
       <div class="header">
-        <h1 class="title header__title">Todos list</h1>
+        <h1 class="title header__title">Groups of todos</h1>
         <div class="header__toolbar toolbar">
           <button class="button button_danger" onclick="${dispatchRemoveAllGroups()}">
             ${removeIcon()}
